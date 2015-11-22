@@ -33,8 +33,6 @@ from tkinter import *
 # Specifically import these separate tkinter modules
 import tkinter.messagebox
 import tkinter.commondialog
-from tkinter.simpledialog import askstring
-import threading
 '''
 # These are used to query Princeton's WordNet for parts of speech in order to make more educated guesses
 from bs4 import BeautifulSoup
