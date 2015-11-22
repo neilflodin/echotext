@@ -1,0 +1,43 @@
+EchoText version 1.0 Created by Neil Flodin
+
+For up-to-date information on EchoText's development and news pertaining to
+EchoText, please visit the website at <http://echotext.neilflodin.com.> or the GitHub page at <https://github.com/neilflodin/echotext>. Bug tracking is done semi-informally through the GitHub page or you can just email me at <neil@neilflodin.com> with any bugs you find.
+
+Please, if can find a reproducable bug on your computer, please let me know!
+
+--- LICENSE --- Copyright (c) 2015 Neil Flodin <neil@neilflodin.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--- INSTRUCTIONS ---
+
+Thank you for trying out EchoText! To get started, click on the "Add Source"
+button  at the top of the screen and paste some text you have writted before. It
+can be anything  from a school essay to a Facebook post. Name your new source
+something cool and click on  the "Create Source" button. The source text itself
+won't be saved, but a mapping of how  different words in the text follow each
+other and the patterns you exhibit in the text will be saved in a sourcefile, in
+the application's "sources" folder.
+
+Now that you've added a source file, click on the "Input" menu item. you should
+see some  buttons with different key combinations and words inside of them... By
+entering a button's corresponding key combination or pressing the button you can
+enter that text into whatever text field you're currently working in. After entering some new text the suggestions in the window will change.
+
+If you find the program isn't predicting your typing habits accurately, try adding another source file. If predictions are VERY wrong and you believe it could be a bug, email me at <neil@neilflodin.com>.
