@@ -934,6 +934,7 @@ def update_source_masterobject():
 
 def sourceframe_background_clicked(event):
     global source_element_selected_index, source_elements_label_widget_list, source_elements_checkbutton_widget_list
+    source_element_selected_index = None
     for source_index2 in range( 0, len( sources_list["sources_list"] )):
         source_elements_label_widget_list[ source_index2 ].config( background = "white", foreground = "black" )
         source_elements_checkbutton_widget_list[ source_index2 ].config( background = "white", activebackground = "white", highlightbackground = "white" )
