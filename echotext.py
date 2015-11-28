@@ -1,4 +1,4 @@
-# echotext Version 1.0 by Neil Flodin
+# echotext Version 1.1 by Neil Flodin
 # 
 # A simply widget that uses predictive text analysis to provide 
 # user customized predictive text input, similar to that seen now 
@@ -152,7 +152,7 @@ def save_settings(settingsObj):
 # Try to load settings file
 # If unsuccessful, create one
 # Default settings
-default_settings = { "keep_window_on_top" : TRUE, "make_window_transparent" : FALSE, "version": "1.0" }
+default_settings = { "keep_window_on_top" : TRUE, "make_window_transparent" : FALSE, "version": "1.1" }
 settings = {}
 openedFile = {}
 fileText = ""
@@ -180,7 +180,7 @@ def save_sources(sourcesObj):
     return
 
 # Load the list of sources from sources.json
-default_sources = { "version" : "1.0", "sources_list" : [] }
+default_sources = { "version" : "1.1", "sources_list" : [] }
 sources_list = {}
 openedFile = {}
 fileText = ""
@@ -369,7 +369,7 @@ def source_create_ok_clicked():
 
     # Now we have an array of every individual sentence
 
-    new_source_json_data = { "version" : "1.0", "top_word_list" : {} }
+    new_source_json_data = { "version" : "1.1", "top_word_list" : {} }
 
     # Do following for every sentence that will be parsed
     for sentence_index in range(0, len( empty_sentences_removed_list )):
