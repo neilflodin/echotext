@@ -59,6 +59,9 @@ except LookupError:
     nltk.download("punkt")
 '''
 
+# I <3 multithreading (Used for update_sources_masterobject)
+import threading
+
 # Sleep function
 import time
 
@@ -241,7 +244,7 @@ def menu_bar_input_button():
 def menu_bar_sources_button():
     # Sources button pressed
     input_frame.pack_forget()
-    update_sources()
+    sourceframe_background_clicked( None )
     sources_frame.pack(fill = BOTH, expand = TRUE)
     return
 def menu_bar_add_source_button():
@@ -773,24 +776,37 @@ def update_suggestions():
         # by "total_frequency"
         removed_words = []
         prev_word_subsequent_words_matching = []
-        prev_word_subsequent_words_unmatching = []
         for listitem in prev_word_subsequent_words:
-            removed_words.append( listitem["word_name"] )
             if listitem["word_name"].lower().find( current_word.lower() ) == 0:
+                removed_words.append( listitem["word_name"] )
                 prev_word_subsequent_words_matching.append( listitem )
-            else:
-                prev_word_subsequent_words_unmatching.append( listitem )
+
         # Sort each array by subseq_frequency
         prev_word_subsequent_words_matching.sort( key = lambda word : word[ "subseq_frequency" ], reverse = True )
-        prev_word_subsequent_words_unmatching.sort( key = lambda word : word[ "subseq_frequency" ], reverse = True )
-        # Populate suggestions array first with matching words, then with unmatching
+
+        # Populate suggestions array with matching words
         for listitem in prev_word_subsequent_words_matching:
             suggestions.insert( len( suggestions ), listitem["word_name"] )
+
+        # If still not full, populate suggestions with words matching current_word from toplevel 
+        # without including removed_words. This list is sorted by frequency.
+
+
+        toplevel_matching_words_sans_removed_words = []
         if len( suggestions ) < 5:
-            for listitem in prev_word_subsequent_words_unmatching:
-                if not len( suggestions ) < 5:
-                    break
-                suggestions.insert( len( suggestions ), listitem["word_name"] )
+            for word in source_master_object:
+                # First test to make sure the word hasn't already been removed from "suggestables"...
+                if not word in removed_words:
+                    # Test to see if the word could possibly overlap with current_word
+                    if word.lower().find( current_word.lower() ) == 0:
+                        removed_words.append( word )
+                        toplevel_matching_words_sans_removed_words.append( word )
+
+        # Sort the matching toplevel words by frequency in source_master_object
+        toplevel_matching_words_sans_removed_words.sort( key = lambda word : source_master_object[ word ][ "total_frequency" ], reverse = True )
+
+        for word_index in range( 0, len( toplevel_matching_words_sans_removed_words ) ):
+            suggestions.insert( len( suggestions ), toplevel_matching_words_sans_removed_words[ word_index ] )
 
         # If suggestions STILL isn't full, populate it with words from the toplevel list
         # sorted by total frequency
@@ -876,11 +892,14 @@ def source_info_element_content_frame_configure( canvas, window, scrollbar ):
     canvas.configure( scrollregion = canvas.bbox("all") )
     canvas.itemconfig( window, width = canvas.winfo_width() - scrollbar.winfo_width() - 10 )
 
-def update_source_masterobject():
-    global source_master_object
+update_sources_masterobject_window = None
+update_sources_masterobject_window_label = None
+update_source_masterobject_worker_thread_return_value = True
+
+def update_source_masterobject_worker_thread():
+    global source_master_object, update_source_masterobject_worker_thread_return_value
 
     source_master_object.clear()
-
 
     activated_sources_json_data = []
     for source in sources_list[ "sources_list" ]:
@@ -897,11 +916,11 @@ def update_source_masterobject():
                     activated_sources_json_data.append(json.loads(fileText))
                 except ValueError:
                     tkinter.messagebox.showerror("JSON Decode Error", "Couldn't decode JSON from source file \"sources/" + source[ "source_name" ] + ".json\". Unable to properly build master object.")
-                    return False
+                    update_source_masterobject_worker_thread_return_value = False
                 # JSON loaded successfully
             else:
                 tkinter.messagebox.showerror("File Load Error", "Couldn't load source file \"sources/" + source[ "source_name" ] + ".json\". Unable to properly build master object.")
-                return False
+                update_source_masterobject_worker_thread_return_value = False
     # All source data to be used is now loaded into the list activated_sources_json_data
 
     # Now assemble each separate source file into one masterobject
@@ -929,8 +948,40 @@ def update_source_masterobject():
                 # New word not in master object
                 # Create new entry and copy over the contents from this source
                 source_master_object[ word ] = activated_source[ "top_word_list" ][ word ]
+    if update_sources_masterobject_window != None:
+        update_sources_masterobject_window.destroy()
+    update_source_masterobject_worker_thread_return_value = True
+    update_suggestions()
+    root.focus_force()
+    return
 
-    return True
+def update_source_masterobject():
+    global source_master_object, update_sources_masterobject_window, \
+    update_sources_masterobject_window_label, update_source_masterobject_worker_thread_return_value
+
+    update_source_masterobject_worker_thread_return_value = True
+
+    update_sources_masterobject_window = Toplevel()
+    update_sources_masterobject_window.title("Updating Compound Sourcefile Data")
+    update_sources_masterobject_window.resizable(width = FALSE, height = FALSE)
+    update_sources_masterobject_window.config(background = "black")
+    update_sources_masterobject_window.wm_attributes("-disabled", "1")
+    update_sources_masterobject_window.geometry("300x50+" + str(int((win32api.GetMonitorInfo(win32api.EnumDisplayMonitors()[0][0])["Work"][2] / 2) \
+        - (300 / 2))) + "+" + str(int((win32api.GetMonitorInfo(win32api.EnumDisplayMonitors()[0][0])["Work"][3] / 2) - (50 / 2))))
+
+    update_sources_masterobject_window_label = Label(update_sources_masterobject_window, text = "Updating combined sourcefile data...\nPlease wait...", justify = CENTER, background = "black", foreground = "white")
+    update_sources_masterobject_window_label.place(relx = 0.5, rely = 0.5, anchor = CENTER)
+
+    update_sources_masterobject_window.wm_transient(master = root)
+    update_sources_masterobject_window.protocol('WM_DELETE_WINDOW', None)
+    update_sources_masterobject_window.focus_set()
+    update_sources_masterobject_window.grab_set()
+
+    worker_thread = threading.Thread( target = update_source_masterobject_worker_thread )
+    worker_thread.daemon = True
+    worker_thread.start()
+
+    return update_source_masterobject_worker_thread_return_value
 
 def sourceframe_background_clicked(event):
     global source_element_selected_index, source_elements_label_widget_list, source_elements_checkbutton_widget_list
@@ -1020,7 +1071,6 @@ def update_sources():
         source_elements_checkbutton_widget_list[ source_index ].grid(row = source_index, column = 1, padx = 1, pady = 1, sticky = N+S+E+W)
 
     update_source_masterobject()
-    update_suggestions()
 
     return
 
